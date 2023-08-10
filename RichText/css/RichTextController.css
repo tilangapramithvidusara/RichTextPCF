@@ -1,26 +1,20 @@
- .ql-toolbar {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  text-align: left;
-  z-index: 100;
-}
+
 
 .quill  {
   position: relative;
 } 
 
-.ql-editor {
+.control-pane .ql-editor {
   min-height: 200px;
 } 
 
-.ql-picker-options {
+.control-pane .ql-picker-options {
   z-index: 999;
   max-height: 150px;
   overflow-y: auto;
 }
 
-.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+.control-pane .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
   bottom: 100%;
   top: auto;
 }
@@ -267,3 +261,22 @@
     width: 8em;
   }
   
+  .control-pane .exclude-copy {
+    position: relative;
+  }
+
+  .control-pane .ql-editor {
+    min-height: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-bottom: 40px;
+  }
+
+  .control-pane .ql-toolbar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align: left;
+    z-index: 100;
+    background-color: #ffffff;
+  }
