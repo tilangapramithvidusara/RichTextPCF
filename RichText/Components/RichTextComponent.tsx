@@ -1,9 +1,8 @@
-import React, { useState, useEffect, ClipboardEvent, useRef } from "react";
-import ReactQuill, { Quill } from "react-quill";
-import "react-quill/dist/quill.snow.css";
-
-import "../css/RichTextController.css";
-import Editor from "./RichTextComponent";
+import React, { useState, ClipboardEvent, useEffect, useRef } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
+import 'quill-mention';
+import 'react-quill/dist/quill.snow.css';
+import '../css/RichTextController.css';
 
 declare global {
   interface Window {
@@ -11,13 +10,146 @@ declare global {
   }
 }
 
-interface EditorWithTabNavigationProps {
-  nextElementId: string;
-}
-
 declare const navigator: any;
 
-const RichTextEditor = ({ quill, context, container }: any) => {
+var Font = Quill.import('formats/font');
+// We do not add Aref Ruqaa since it is the default
+Font.whitelist = ['segoe-ui', 'arial', 'roboto', 'raleway', 'montserrat', 'lato', 'rubik'];
+Quill.register(Font, true);
+
+var Size = Quill.import('formats/size');
+Size.whitelist = [
+  '9px',
+  '10px',
+  '11px',
+  '12px',
+  '14px',
+  '16px',
+  '18px',
+  '20px',
+  '22px',
+  '24px',
+  '26px',
+  '28px'
+];
+Quill.register(Size, true);
+
+// const Parchment = Quill.import('parchment');
+// const boxAttributor = new Parchment.Attributor.Class('box', 'line', {
+//   scope: Parchment.Scope.INLINE,
+//   whitelist: ['solid', 'double', 'dotted']
+// });
+// Quill.register(boxAttributor);
+
+const atValues = [
+  { id: 0, value: 'barcode' },
+  { id: 1, value: 'customername' },
+  { id: 2, value: 'licensenumber' },
+  { id: 3, value: 'netweight' },
+  { id: 4, value: 'packageid' },
+  { id: 5, value: 'price' },
+  { id: 6, value: 'productname' },
+  { id: 7, value: 'supplierid' }
+];
+
+const CustomToolbar = () => (
+  <div id="toolbar">
+    <select className="ql-font">
+      {Font.whitelist.map((font: any, index: any) => (
+        <option value={font} selected={!index}>
+          {font[0].toUpperCase() + font.substr(1)}
+        </option>
+      ))}
+    </select>
+    <select className="ql-size">
+      {Size.whitelist.map((size: any, index: any) => (
+        <option value={size} selected={size.includes('14')}>
+          {size}
+        </option>
+      ))}
+    </select>
+    <button className="ql-bold" />
+    <button className="ql-italic" />
+    <button className="ql-underline" />
+    <button className="ql-align" value="" />
+    <button className="ql-align" value="center" />
+    <button className="ql-align" value="right" />
+    <select className="ql-color">
+      <option value="rgb(0, 0, 0)" />
+      <option value="rgb(230, 0, 0)" />
+      <option value="rgb(255, 153, 0)" />
+      <option value="rgb(255, 255, 0)" />
+      <option value="rgb(0, 138, 0)" />
+      <option value="rgb(0, 102, 204)" />
+      <option value="rgb(153, 51, 255)" />
+      <option value="rgb(255, 255, 255)" />
+      <option value="rgb(250, 204, 204)" />
+      <option value="rgb(255, 235, 204)" />
+      <option value="rgb(204, 224, 245)" />
+      <option value="rgb(235, 214, 255)" />
+      <option value="rgb(187, 187, 187)" />
+      <option value="rgb(102, 185, 102)" />
+    </select>
+    <select className="ql-background">
+      <option value="rgb(0, 0, 0)" />
+      <option value="rgb(230, 0, 0)" />
+      <option value="rgb(255, 153, 0)" />
+      <option value="rgb(255, 255, 0)" />
+      <option value="rgb(0, 138, 0)" />
+      <option value="rgb(0, 102, 204)" />
+      <option value="rgb(153, 51, 255)" />
+      <option value="rgb(255, 255, 255)" />
+      <option value="rgb(250, 204, 204)" />
+      <option value="rgb(255, 235, 204)" />
+      <option value="rgb(204, 224, 245)" />
+      <option value="rgb(235, 214, 255)" />
+      <option value="rgb(187, 187, 187)" />
+      <option value="rgb(102, 185, 102)" />
+    </select>
+    {/* <select className="ql-box">
+      <option selected>None</option>
+      <option value="solid">Solid</option>
+    </select> */}
+  </div>
+);
+
+Editor.modules = {
+  toolbar: {
+    container: '#toolbar'
+  },
+  mention: {
+    allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+    mentionDenotationChars: ['@', '#'],
+    source: function(searchTerm: any, renderList: any, mentionChar: any) {
+      if (searchTerm.length === 0) {
+        renderList(atValues, searchTerm);
+      } else {
+        const matches = [];
+        for (let i = 0; i < atValues.length; i++)
+          if (
+            ~atValues[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())
+          )
+            matches.push(atValues[i]);
+        renderList(matches, searchTerm);
+      }
+    }
+  }
+};
+
+Editor.formats = [
+  'bold',
+  'underline',
+  'italic',
+  'font',
+  'size',
+  'align',
+  'box',
+  'mention',
+  "color",
+  "background",
+];
+
+export default function Editor() {
   const [value, setValue] = useState("");
   const [isDisable, setIsDisable] = useState<boolean>(false);
   const quillRef = useRef<ReactQuill>(null);
@@ -208,28 +340,6 @@ const RichTextEditor = ({ quill, context, container }: any) => {
     window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
   };
 
-  // var FontAttributor = Quill.import('attributors/class/font');
-  // FontAttributor.whitelist = [
-  //   'sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu', 'courier_new', 'custom_font_1', 'custom_font_2'
-  //   // Add your custom font families here
-  // ];
-  // Quill.register(FontAttributor, true);
-
-  
-
-  const modules = {
-    toolbar: [
-      [{ font: [] }],
-      [{ size: [] }],
-      ["bold", "italic", "underline"],
-      [{ color: [] }, { background: [] }],
-      [{ list: "ordered" }, { list: "bullet" }],
-    ],
-    clipboard: { matchVisual: false },
-  }
-
-  // const editorRef = useRef<any | null>(null);
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     console.log('event key ====> ', event.key, event.shiftKey);
     
@@ -259,30 +369,31 @@ const RichTextEditor = ({ quill, context, container }: any) => {
   // }, []);
 
   return (
-    <>
-      <div
-        className="exclude-copy"
-        onCopy={(e: any) => preventCopyPaste(e)}
-        onCut={(e: any) => preventCopyPaste(e)}
-        onDragOver={dragOver}
-        onDrop={drop}
-        onDragStart={dragStart}
-        onSelect={preventSelect}
-      >
-        <ReactQuill
-          ref={quillRef}
-          onKeyDown={handleKeyDown}
-          onChange={handleChange}
-          value={value}
-          modules={modules}
-          readOnly={isDisable}
-          bounds=".app"
-          id={"rich_text_editor_element"}
-        />
-      </div>
-      {/* <Editor/> */}
-    </>
+    <div 
+      className="exclude-copy"
+      onCopy={(e: any) => preventCopyPaste(e)}
+      onCut={(e: any) => preventCopyPaste(e)}
+      onDragOver={dragOver}
+      onDrop={drop}
+      onDragStart={dragStart}
+      onSelect={preventSelect}
+    >
+    {/* <div className="text-editor"> */}
+      <CustomToolbar />
+      <ReactQuill
+        theme="snow"
+        modules={Editor.modules}
+        formats={Editor.formats}
+        value={value}
+        // style={{ height: '400px' }}
+        id={"rich_text_editor_element"}
+        bounds=".app"
+        ref={quillRef}
+        onKeyDown={handleKeyDown}
+        onChange={handleChange}
+        readOnly={isDisable}
+      />
+    {/* </div> */}
+    </div>
   );
-};
-
-export default RichTextEditor;
+}
