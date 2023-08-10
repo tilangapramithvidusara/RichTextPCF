@@ -262,56 +262,56 @@ export default function Editor() {
     };
   }, []);
 
-  useEffect(() => {
-    const handlePaste = async (event: any) => {
-      type PermissionName = "geolocation" | "notifications" | "persistent-storage" | "push" | "screen-wake-lock" | "xr-spatial-tracking";
-      type  MyPermissionName = PermissionName | 'clipboard-read' | 'clipboard-write';
-      try {
-        const permision: MyPermissionName = "clipboard-read";
+  // useEffect(() => {
+  //   const handlePaste = async (event: any) => {
+  //     type PermissionName = "geolocation" | "notifications" | "persistent-storage" | "push" | "screen-wake-lock" | "xr-spatial-tracking";
+  //     type  MyPermissionName = PermissionName | 'clipboard-read' | 'clipboard-write';
+  //     try {
+  //       const permision: MyPermissionName = "clipboard-read";
         
-        if (navigator.userAgent.includes("Safari/") && !(navigator.userAgent.includes("Chrome/") || navigator.userAgent.includes("Edge/"))) {
-          event.preventDefault();
-          await navigator.clipboard.writeText(apiNotSupport);
-          await navigator.clipboard.writeText("");
-        } else if (navigator.userAgent.includes("Firefox/")) {
-          await navigator.clipboard.writeText(apiNotSupport);
-        } else if (navigator?.permissions) {          
-          // const permissionName = "clipboard-read" as PermissionName;
-          const permissionStatus = await navigator.permissions.query({name: permision as PermissionName, allowWithoutGesture: false}); // allowWithoutGesture: false
-          console.log('permissionStatus =================> ', permissionStatus);
+  //       if (navigator.userAgent.includes("Safari/") && !(navigator.userAgent.includes("Chrome/") || navigator.userAgent.includes("Edge/"))) {
+  //         event.preventDefault();
+  //         await navigator.clipboard.writeText(apiNotSupport);
+  //         await navigator.clipboard.writeText("");
+  //       } else if (navigator.userAgent.includes("Firefox/")) {
+  //         await navigator.clipboard.writeText(apiNotSupport);
+  //       } else if (navigator?.permissions) {          
+  //         // const permissionName = "clipboard-read" as PermissionName;
+  //         const permissionStatus = await navigator.permissions.query({name: permision as PermissionName, allowWithoutGesture: false}); // allowWithoutGesture: false
+  //         console.log('permissionStatus =================> ', permissionStatus);
           
-          if (permissionStatus.state === "granted") { // permissionStatus.state === "granted" || permissionStatus.state === "prompt"
-            let clipboardData = await navigator.clipboard.readText();
+  //         if (permissionStatus.state === "granted") { // permissionStatus.state === "granted" || permissionStatus.state === "prompt"
+  //           let clipboardData = await navigator.clipboard.readText();
 
-            let descriptionText = quillRef?.current?.editor?.getText();            
+  //           let descriptionText = quillRef?.current?.editor?.getText();            
 
-            if (descriptionText &&  descriptionText?.charCodeAt(0) !== 10) {
-              clipboardData = clipboardData.toString().replace(/[^\x20-\x7E]/g, '');
-              descriptionText = descriptionText.toString().replace(/[^\x20-\x7E]/g, '');
-              console.log('condition ====> ', clipboardData.includes(descriptionText));
+  //           if (descriptionText &&  descriptionText?.charCodeAt(0) !== 10) {
+  //             clipboardData = clipboardData.toString().replace(/[^\x20-\x7E]/g, '');
+  //             descriptionText = descriptionText.toString().replace(/[^\x20-\x7E]/g, '');
+  //             console.log('condition ====> ', clipboardData.includes(descriptionText));
 
-              if (clipboardData.includes(descriptionText)) {
-                await navigator.clipboard.writeText(copyNotAllowed);
-              }
-            }
-          } else {
-            await navigator.clipboard.writeText(grantPermission);
-          }
-        } else {
-          await navigator.clipboard.writeText(apiNotSupport);
-        }
-      } catch (error) {
-        console.error(error);
-        await navigator.clipboard.writeText(copyNotAllowed);
-      }
-    };
+  //             if (clipboardData.includes(descriptionText)) {
+  //               await navigator.clipboard.writeText(copyNotAllowed);
+  //             }
+  //           }
+  //         } else {
+  //           await navigator.clipboard.writeText(grantPermission);
+  //         }
+  //       } else {
+  //         await navigator.clipboard.writeText(apiNotSupport);
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //       await navigator.clipboard.writeText(copyNotAllowed);
+  //     }
+  //   };
 
-    document.addEventListener("copy", handlePaste);
+  //   document.addEventListener("copy", handlePaste);
 
-    return () => {
-      document.removeEventListener("copy", handlePaste);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("copy", handlePaste);
+  //   };
+  // }, []);
 
   function dragOver(ev: any) {
     ev.preventDefault();
