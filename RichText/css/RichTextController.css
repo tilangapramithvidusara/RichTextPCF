@@ -4,7 +4,7 @@
   position: relative;
 } 
 
-.control-pane .ql-editor {
+/* .control-pane .ql-editor {
   min-height: 200px;
 } 
 
@@ -15,6 +15,21 @@
 }
 
 .control-pane .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+  bottom: 100%;
+  top: auto;
+} */
+
+.exclude-copy .ql-editor {
+  min-height: 200px;
+} 
+
+.exclude-copy .ql-picker-options {
+  z-index: 999;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.exclude-copy .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
   bottom: 100%;
   top: auto;
 }
@@ -260,8 +275,28 @@
   .ql-snow span.ql-picker.ql-box {
     width: 8em;
   }
+
+  .exclude-copy .exclude-copy {
+    position: relative;
+  }
+
+  .exclude-copy .ql-editor {
+    min-height: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-bottom: 40px;
+  }
+
+  .exclude-copy .ql-toolbar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align: left;
+    z-index: 100;
+    background-color: #ffffff;
+  }
   
-  .control-pane .exclude-copy {
+  /* .control-pane .exclude-copy {
     position: relative;
   }
 
@@ -279,4 +314,6 @@
     text-align: left;
     z-index: 100;
     background-color: #ffffff;
-  }
+  } */
+
+  /* exclude-copy */
