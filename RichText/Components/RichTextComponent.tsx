@@ -106,6 +106,11 @@ const CustomToolbar = () => (
       <option value="rgb(187, 187, 187)" />
       <option value="rgb(102, 185, 102)" />
     </select>
+    <button className="ql-list" value="ordered"></button>
+    <button className="ql-list" value="bullet"></button>
+    {/* <span className="ql-formats">
+      <button className="ql-list" value="bullet"></button>
+    </span> */}
     {/* <select className="ql-box">
       <option selected>None</option>
       <option value="solid">Solid</option>
@@ -114,6 +119,7 @@ const CustomToolbar = () => (
 );
 
 Editor.modules = {
+  // [{ list: "ordered" }, { list: "bullet" }],
   toolbar: {
     container: '#toolbar'
   },
@@ -132,7 +138,13 @@ Editor.modules = {
             matches.push(atValues[i]);
         renderList(matches, searchTerm);
       }
+    },
+    clipboard: {
+      matchVisual: false
     }
+    // list: function() {
+    //   this.quill.format('list', !this.quill.getFormat().list);
+    // }
   }
 };
 
@@ -147,6 +159,7 @@ Editor.formats = [
   'mention',
   "color",
   "background",
+  "list"
 ];
 
 export default function Editor() {
@@ -334,10 +347,52 @@ export default function Editor() {
     event.preventDefalt();
   }
 
-  const handleChange = (html: any) => {
-    console.log("html", html);
-    setValue(html);
-    window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+  // const handleChange = (html: any) => {
+  //   console.log("html", html);
+  //   setValue(html);
+  //   window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+  // };
+  function replaceLastSelected(str: string, itemToReplace: string, replacement: any) {
+    const lastIndex = str.lastIndexOf(itemToReplace);
+    
+    if (lastIndex !== -1) {
+      const before = str.substring(0, lastIndex);
+      const after = str.substring(lastIndex + itemToReplace.length);
+      return before + replacement + after;
+    }
+    
+    return str;
+  }
+  const handleChange = (html: any, delta: any, source: any, editor: any) => {
+    let newHtml = html
+    if (source == 'user') {
+      // Check if Enter key was pressed      
+      const lastDelta = delta?.ops[delta?.ops.length - 1];      
+
+      if (lastDelta && lastDelta.insert === "\n") {
+        const pattern = /<li><br><\/li>/g;
+
+        // Use the match method to find all occurrences of the pattern
+        const matches = html.match(pattern);
+
+        // Count the number of matches
+        const count = matches ? matches.length : 0;
+        
+        if (lastDelta?.attributes?.list && lastDelta?.attributes?.list === 'bullet' && count >= 1)
+          html = replaceLastSelected(html, "</li><li><br></li>", '</li>')
+        // html.replace("<li><br></li>", '')
+        if (lastDelta?.attributes?.list && lastDelta?.attributes?.list === 'ordered' && count >= 1)
+          html = replaceLastSelected(html, "</li><li><br></li>", '</li>')
+        // html = html.replace("<li><br></li>", '')
+      }
+    }
+
+    setTimeout(() => {
+      setValue(html);
+      window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+    }, 50)
+    // setValue(html);
+    // window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -379,7 +434,7 @@ export default function Editor() {
       onSelect={preventSelect}
     >
     {/* <div className="text-editor"> */}
-      <CustomToolbar />
+      <CustomToolbar/>
       <ReactQuill
         theme="snow"
         modules={Editor.modules}
@@ -387,8 +442,8 @@ export default function Editor() {
         value={value}
         // style={{ height: '400px' }}
         id={"rich_text_editor_element"}
-        bounds=".app"
-        ref={quillRef}
+        // bounds=".app"
+        // ref={quillRef}
         onKeyDown={handleKeyDown}
         onChange={handleChange}
         readOnly={isDisable}
