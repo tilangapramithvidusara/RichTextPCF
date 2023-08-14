@@ -3,13 +3,11 @@
 }
 
 .exclude-copy .ql-editor {
-  min-height: 200px;
+  min-height: 225px;
 }
 
 .exclude-copy .ql-picker-options {
   z-index: 999;
-  max-height: 150px;
-  overflow-y: auto;
 }
 
 .exclude-copy .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
@@ -38,12 +36,12 @@
   position: relative;
 }
 
-.exclude-copy .ql-editor {
+/* .exclude-copy .ql-editor {
   min-height: 200px;
   max-height: 200px;
   overflow-y: auto;
   padding-bottom: 40px;
-}
+} */
 
 .exclude-copy .ql-toolbar {
   position: absolute;
