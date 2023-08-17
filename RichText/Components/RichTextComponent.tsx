@@ -3,6 +3,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'quill-mention';
 import 'react-quill/dist/quill.snow.css';
 import '../css/RichTextController.css';
+import { Spin } from 'antd';
 
 declare global {
   interface Window {
@@ -165,6 +166,7 @@ Editor.formats = [
 export default function Editor() {
   const [value, setValue] = useState("");
   const [isDisable, setIsDisable] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false)
   const quillRef = useRef<ReactQuill>(null);
   const [copyNotAllowed, setCopyNotAllowed] = useState<string>("Copying questions is not allowed on this webpage");
   const [apiNotSupport, setApiNotSupport] = useState<string>("Permissions API not supported")
@@ -216,26 +218,31 @@ export default function Editor() {
 
   const retriveTemplateHandler = async () => {
     try {
-      var surveyTemplate = await window.parent.Xrm.Page.getAttribute("gyde_surveytemplate")?.getValue()[0]?.id?.replace("{", "")
-      .replace("}", "");
-      console.log('id ===> ', surveyTemplate);
-      
-      window.parent.Xrm.WebApi.retrieveRecord("gyde_surveytemplate", surveyTemplate, "?$select=statuscode").then(
-        function success(result: any) {
-            console.log("result status ====>", result.statuscode);
-            if (result.statuscode == 528670003 || result.statuscode == 528670005) {
-              setIsDisable(true)
-            } else {
+      const template = await window.parent.Xrm.Page?.getAttribute("gyde_surveytemplate")?.getValue()
+      // if (template === null || typeof template === 'undefined') {
+        var surveyTemplate = template[0]?.id?.replace("{", "")
+        .replace("}", "");
+        console.log('id ===> ', surveyTemplate);
+        
+        window.parent.Xrm.WebApi.retrieveRecord("gyde_surveytemplate", surveyTemplate, "?$select=statuscode").then(
+          function success(result: any) {
+              console.log("result status ====>", result.statuscode);
+              if (result.statuscode == 528670003 || result.statuscode == 528670005) {
+                setIsDisable(true)
+              } else {
+                setIsDisable(false);
+              }
+              // perform operations on record retrieval
+          },
+          function (error: any) {
+              console.log("error message ====> ", error.message);
               setIsDisable(false);
-            }
-            // perform operations on record retrieval
-        },
-        function (error: any) {
-            console.log("error message ====> ", error.message);
-            setIsDisable(false);
-            // handle error conditions
-        }
-      );
+              // handle error conditions
+          }
+        );
+      // } else {
+      //   retriveTemplateHandler();
+      // }
     } catch (error: any) {
       console.log("error22 message ====> ", error);
       setIsDisable(false);
@@ -243,26 +250,59 @@ export default function Editor() {
   }
 
   const dataRetriveHandler = async() => {
+    setLoading(true);
     try {
-      const content = await window.parent.Xrm.Page.getAttribute("gyde_description").getValue();
-      console.log('Content ====> ', content);
-      setValue(content);
+      setTimeout(async() => {
+        const contentData = await window.parent.Xrm.Page?.getAttribute("gyde_description")?.getValue();
+      // if (contentData === null || typeof contentData === 'undefined') {
+        // const content = await window.parent.Xrm.Page.getAttribute("gyde_description").getValue();
+        console.log('Content ====> ', contentData);
+        setValue(contentData);
+        setLoading(false)
+      }, 1000);
+      // const contentData = await window.parent.Xrm.Page?.getAttribute("gyde_description")?.getValue();
+      // // if (contentData === null || typeof contentData === 'undefined') {
+      //   // const content = await window.parent.Xrm.Page.getAttribute("gyde_description").getValue();
+      //   console.log('Content ====> ', contentData);
+      //   setValue(contentData);
+      //   setLoading(false)
+      // } else {
+      //   dataRetriveHandler();
+      // }
     } catch (error) {
       console.log('load error ===> ', error);
+      setLoading(false)
     }
   }
 
+  // useEffect(() => {
+  //   console.log('======ww=====> ', value);
+  //   // if (!value || (value == '')) {
+  //   //   dataRetriveHandler();
+  //   // }
+  //   dataRetriveHandler();
+  // }, []);
+
   useEffect(() => {
-    console.log('======ww=====> ', value);
-    if (!value || (value == '')) {
+    setTimeout(() => {
       dataRetriveHandler();
-    }
+      messageHandler();
+      retriveTemplateHandler();
+    }, 1000)
+    // dataRetriveHandler();
+    // messageHandler();
+    // retriveTemplateHandler();
   }, []);
 
   useEffect(() => {
-    messageHandler();
-    retriveTemplateHandler();
-  }, []);
+    console.log('va ======> ', value);
+    
+    if (value === null) {
+      dataRetriveHandler();
+      messageHandler();
+      retriveTemplateHandler();
+    }
+  }, [value])
 
   useEffect(() => {
     const handleContextMenu = (event: any) => {
@@ -387,16 +427,22 @@ export default function Editor() {
       }
     }
 
+    if (html == '<p><br></p>') {
+      html = '';
+    }
+
+    setValue(html);
+
     setTimeout(() => {
-      setValue(html);
+      // setValue(html);
       window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
-    }, 50)
+    }, 1)
     // setValue(html);
     // window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    console.log('event key ====> ', event.key, event.shiftKey);
+    // console.log('event key ====> ', event.key, event.shiftKey);
     
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
@@ -407,7 +453,7 @@ export default function Editor() {
       // Perform your logic to move the focus to the next element here
       const nextElementId: any = "gyde_helptext";
       const nextInputElement = window.parent.Xrm.Page.ui._formContext.getControl(nextElementId);
-      console.log("nextInputElement =====> ", nextInputElement);
+      // console.log("nextInputElement =====> ", nextInputElement);
       
       if (nextInputElement) {
         nextInputElement.setFocus();
@@ -424,31 +470,44 @@ export default function Editor() {
   // }, []);
 
   return (
-    <div 
-      className="exclude-copy"
-      onCopy={(e: any) => preventCopyPaste(e)}
-      onCut={(e: any) => preventCopyPaste(e)}
-      onDragOver={dragOver}
-      onDrop={drop}
-      onDragStart={dragStart}
-      onSelect={preventSelect}
-    >
-    {/* <div className="text-editor"> */}
-      <CustomToolbar/>
-      <ReactQuill
-        theme="snow"
-        modules={Editor.modules}
-        formats={Editor.formats}
-        value={value}
-        // style={{ height: '400px' }}
-        id={"rich_text_editor_element"}
-        // bounds=".app"
-        // ref={quillRef}
-        onKeyDown={handleKeyDown}
-        onChange={handleChange}
-        readOnly={isDisable}
-      />
-    {/* </div> */}
-    </div>
+    <Spin size='small' spinning={loading}>
+      {!isDisable ? (
+        <div 
+          className="exclude-copy"
+          onCopy={(e: any) => preventCopyPaste(e)}
+          onCut={(e: any) => preventCopyPaste(e)}
+          onDragOver={dragOver}
+          onDrop={drop}
+          onDragStart={dragStart}
+          onSelect={preventSelect}
+        >
+        {/* <div className="text-editor"> */}
+          
+            <CustomToolbar/>
+            <ReactQuill
+              theme="snow"
+              modules={Editor.modules}
+              formats={Editor.formats}
+              value={value}
+              // style={{ height: '400px' }}
+              id={"rich_text_editor_element"}
+              // bounds=".app"
+              // ref={quillRef}
+              onKeyDown={handleKeyDown}
+              onChange={handleChange}
+              readOnly={isDisable}
+            />
+        {/* </div> */}
+        </div>
+      ) : (
+        <div>
+          {value && (
+            <div dangerouslySetInnerHTML={{ __html: value }} />
+          )}
+          {/* <div dangerouslySetInnerHTML={{ __html: value }} /> */}
+          {/* {value} */}
+        </div>
+      )}
+    </Spin>
   );
 }
