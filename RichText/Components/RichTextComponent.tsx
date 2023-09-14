@@ -166,7 +166,10 @@ Editor.formats = [
 export default function Editor() {
   const [value, setValue] = useState("");
   const [isDisable, setIsDisable] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [loadingTemp, setLoadingTemp] = useState<boolean>(true)
+  const [location, setLocation] = useState<string>('');
+  const [recordIdData, setRecordIdData] = useState();
   const quillRef = useRef<ReactQuill>(null);
   const [copyNotAllowed, setCopyNotAllowed] = useState<string>("Copying questions is not allowed on this webpage");
   const [apiNotSupport, setApiNotSupport] = useState<string>("Permissions API not supported")
@@ -217,10 +220,13 @@ export default function Editor() {
   }
 
   const retriveTemplateHandler = async () => {
+    setLoadingTemp(true);
     try {
-      const template = await window.parent.Xrm.Page?.getAttribute("gyde_surveytemplate")?.getValue()
+      const currentLocation = await window.parent.Xrm.Page.ui._formContext.contextToken.entityTypeName;
+      const template = (currentLocation === 'gyde_surveytemplate') ? await window.parent.Xrm.Page.data.entity.getId()
+        : await window.parent.Xrm.Page?.getAttribute("gyde_surveytemplate")?.getValue()
       // if (template === null || typeof template === 'undefined') {
-        var surveyTemplate = template[0]?.id?.replace("{", "")
+        var surveyTemplate = (currentLocation === 'gyde_surveytemplate') ? template?.replace("{", "").replace("}", "")  : template[0]?.id?.replace("{", "")
         .replace("}", "");
         console.log('id ===> ', surveyTemplate);
         
@@ -232,11 +238,13 @@ export default function Editor() {
               } else {
                 setIsDisable(false);
               }
+              setLoadingTemp(false);
               // perform operations on record retrieval
           },
           function (error: any) {
               console.log("error message ====> ", error.message);
               setIsDisable(false);
+              setLoadingTemp(false);
               // handle error conditions
           }
         );
@@ -253,12 +261,26 @@ export default function Editor() {
     setLoading(true);
     try {
       setTimeout(async() => {
-        const contentData = await window.parent.Xrm.Page?.getAttribute("gyde_description")?.getValue();
-      // if (contentData === null || typeof contentData === 'undefined') {
-        // const content = await window.parent.Xrm.Page.getAttribute("gyde_description").getValue();
-        console.log('Content ====> ', contentData);
-        setValue(contentData);
-        setLoading(false)
+        const currentLocation = await window.parent.Xrm.Page.ui._formContext.contextToken.entityTypeName;
+        
+        setLocation(currentLocation);
+        const recordeId = await window.parent.Xrm.App.sidePanes.getSelectedPane()?._paneId;
+        setRecordIdData(recordeId)
+
+        console.log('======> ', currentLocation, recordeId, (typeof recordeId === 'undefined' || currentLocation === 'gyde_surveytemplate'));
+        if (currentLocation !== 'gyde_surveytemplate') {
+          const contentData = await window.parent.Xrm.Page?.getAttribute("gyde_description")?.getValue();
+          console.log('Content1 ====> ', contentData);
+
+          setValue(contentData);
+          setLoading(false)
+        } else {
+          const contentData = await window.parent.Xrm.WebApi.retrieveRecord("gyde_surveytemplatechaptersectionquestion", recordeId, "?$select=gyde_description")
+          console.log('Content2 ====> ', contentData);
+
+          setValue(contentData?.gyde_description);
+          setLoading(false)
+        }
       }, 1000);
       // const contentData = await window.parent.Xrm.Page?.getAttribute("gyde_description")?.getValue();
       // // if (contentData === null || typeof contentData === 'undefined') {
@@ -435,7 +457,20 @@ export default function Editor() {
 
     setTimeout(() => {
       // setValue(html);
-      window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+      if (location === 'gyde_surveytemplate') {
+        const record: any = {};
+        record.gyde_description = html; // Multiline Text
+        try {
+          const result = window.parent.Xrm.WebApi.updateRecord("gyde_surveytemplatechaptersectionquestion", recordIdData, record);
+          console.log('result => ', result)
+        } catch (error) {
+          console.log("entity added error ===> ", error);
+          
+        }
+      } else {
+        window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+      }
+      // window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
     }, 1)
     // setValue(html);
     // window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
@@ -470,7 +505,11 @@ export default function Editor() {
   // }, []);
 
   return (
-    <Spin size='small' spinning={loading}>
+    <div>
+      {loading ? (
+        <Spin size='small' spinning={loading || loadingTemp}></Spin>
+      ) : (
+        <Spin size='small' spinning={loading}>
       {!isDisable ? (
         <div 
           className="exclude-copy"
@@ -497,17 +536,20 @@ export default function Editor() {
               onChange={handleChange}
               readOnly={isDisable}
             />
-        {/* </div> */}
-        </div>
-      ) : (
-        <div>
-          {value && (
-            <div dangerouslySetInnerHTML={{ __html: value }} />
+          {/* </div> */}
+          </div>
+          ) : (
+            <div>
+              {value && (
+                <div dangerouslySetInnerHTML={{ __html: value }} />
+              )}
+              {/* <div dangerouslySetInnerHTML={{ __html: value }} /> */}
+              {/* {value} */}
+            </div>
           )}
-          {/* <div dangerouslySetInnerHTML={{ __html: value }} /> */}
-          {/* {value} */}
-        </div>
+        </Spin>
       )}
-    </Spin>
+    </div>
+    
   );
 }

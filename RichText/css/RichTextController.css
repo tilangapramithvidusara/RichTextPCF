@@ -4,21 +4,21 @@
 
 /* .exclude-copy .ql-editor {
   min-height: 200px;
-}
+} */
 
 .exclude-copy .ql-picker-options {
   z-index: 999;
   max-height: 150px;
   overflow-y: auto;
-} */
+}
 
 .exclude-copy .ql-editor {
   min-height: 225px;
 }
 
-.exclude-copy .ql-picker-options {
+/* .exclude-copy .ql-picker-options {
   z-index: 999;
-}
+} */
 
 .exclude-copy .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
   bottom: 100%;
