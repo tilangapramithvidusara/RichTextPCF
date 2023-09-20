@@ -481,6 +481,10 @@ export default function Editor() {
     
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
+      const newValue = value.replace('\t', '');
+      console.log('vfv===> ', newValue, value)
+      setValue(newValue);
+      window.parent.Xrm.Page.getAttribute("gyde_description").setValue(newValue);
 
       // const editor = editorRef.current?.getEditor();
       // const range = editor?.getSelection()?.index || 0;
