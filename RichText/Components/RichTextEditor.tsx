@@ -3,6 +3,7 @@ import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 import "../css/RichTextController.css";
+import Editor from "./RichTextComponent";
 
 declare global {
   interface Window {
@@ -77,7 +78,7 @@ const RichTextEditor = ({ quill, context, container }: any) => {
       window.parent.Xrm.WebApi.retrieveRecord("gyde_surveytemplate", surveyTemplate, "?$select=statuscode").then(
         function success(result: any) {
             console.log("result status ====>", result.statuscode);
-            if (result.statuscode == 528670003 || result.statuscode == 528670005) {
+            if (result.statuscode == 528670003 || result.statuscode == 528670005 || result.statuscode == 2) {
               setIsDisable(true)
             } else {
               setIsDisable(false);
@@ -106,17 +107,17 @@ const RichTextEditor = ({ quill, context, container }: any) => {
     }
   }
 
-  useEffect(() => {
-    console.log('======ww=====> ', value);
-    if (!value || (value == '')) {
-      dataRetriveHandler();
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log('======ww=====> ', value);
+  //   if (!value || (value == '')) {
+  //     dataRetriveHandler();
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    messageHandler();
-    retriveTemplateHandler();
-  }, []);
+  // useEffect(() => {
+  //   messageHandler();
+  //   retriveTemplateHandler();
+  // }, []);
 
   useEffect(() => {
     const handleContextMenu = (event: any) => {
@@ -204,8 +205,17 @@ const RichTextEditor = ({ quill, context, container }: any) => {
   const handleChange = (html: any) => {
     console.log("html", html);
     setValue(html);
-    window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
+    // window.parent.Xrm.Page.getAttribute("gyde_description").setValue(html);
   };
+
+  // var FontAttributor = Quill.import('attributors/class/font');
+  // FontAttributor.whitelist = [
+  //   'sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu', 'courier_new', 'custom_font_1', 'custom_font_2'
+  //   // Add your custom font families here
+  // ];
+  // Quill.register(FontAttributor, true);
+
+  
 
   const modules = {
     toolbar: [
@@ -225,7 +235,10 @@ const RichTextEditor = ({ quill, context, container }: any) => {
     
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
-
+      const newValue = value.slice(0, -1)
+      console.log('vfv===> ', newValue, value)
+      setValue(newValue);
+      window.parent.Xrm.Page.getAttribute("gyde_description").setValue(newValue);
       // const editor = editorRef.current?.getEditor();
       // const range = editor?.getSelection()?.index || 0;
 
@@ -270,6 +283,7 @@ const RichTextEditor = ({ quill, context, container }: any) => {
           id={"rich_text_editor_element"}
         />
       </div>
+      {/* <Editor/> */}
     </>
   );
 };

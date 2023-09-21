@@ -1,46 +1,86 @@
- .ql-toolbar {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  text-align: left;
-  z-index: 100;
+.exclude-copy .quill {
+  position: relative;
 }
 
-.quill  {
-  position: relative;
-} 
-
-.ql-editor {
+/* .exclude-copy .ql-editor {
   min-height: 200px;
-} 
+} */
 
-.ql-picker-options {
+.exclude-copy .ql-picker-options {
   z-index: 999;
   max-height: 150px;
   overflow-y: auto;
 }
 
-.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+.exclude-copy .ql-editor {
+  min-height: 225px;
+}
+
+/* .exclude-copy .ql-picker-options {
+  z-index: 999;
+} */
+
+.exclude-copy .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
   bottom: 100%;
   top: auto;
 }
 
-/* .ql-picker-label {
+.exclude-copy .ql-snow .ql-picker-options {
+  padding: 0;
+}
 
+.exclude-copy .ql-picker-item {
+  padding: 4px 8px;
+}
+
+.exclude-copy .ql-picker-item:hover {
+  background-color: #cccccc;
+}
+
+.exclude-copy .ql-container {
+  font-family: 'Segoe UI', Arial;
+  font-size: 14px;
+}
+
+.exclude-copy {
+  position: relative;
+}
+
+/* .exclude-copy .ql-editor {
+  min-height: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-bottom: 40px;
 } */
 
-.ql-font, .ql-font:hover, .ql-font:active, .ql-font:focus, .ql-size, .ql-size:hover, .ql-size:active, .ql-size:focus {
+.exclude-copy .ql-toolbar {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  text-align: left;
+  z-index: 100;
+  background-color: #ffffff;
+}
+
+.ql-font,
+.ql-font:hover,
+.ql-font:active,
+.ql-font:focus,
+.ql-size,
+.ql-size:hover,
+.ql-size:active,
+.ql-size:focus {
   margin: 0px 6px 0px 0px;
-    border: 1px solid rgb(225, 225, 225);
-    cursor: default;
-    background: rgb(255, 255, 255);
-    transition: none 0s ease 0s;
-    border-collapse: collapse;
-    font: 12px Arial, Helvetica, Tahoma, Verdana, sans-serif !important;
-    color: rgb(71, 71, 71) !important;
-    text-align: left;
-    white-space: nowrap;
-    font-weight: 400 !important;
+  border: 1px solid rgb(225, 225, 225);
+  cursor: default;
+  background: rgb(255, 255, 255);
+  transition: none 0s ease 0s;
+  border-collapse: collapse;
+  font: 12px Arial, Helvetica, Tahoma, Verdana, sans-serif !important;
+  color: rgb(71, 71, 71) !important;
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 400 !important;
 }
 
 .ql-toolbar {
@@ -51,22 +91,237 @@
   color: rgb(71, 71, 71) !important;
 }
 
-.ql-snow.ql-toolbar button:hover, .ql-snow .ql-toolbar button:hover, .ql-snow.ql-toolbar button:focus, .ql-snow .ql-toolbar button:focus, .ql-snow.ql-toolbar button.ql-active, .ql-snow .ql-toolbar button.ql-active, .ql-snow.ql-toolbar .ql-picker-label:hover, .ql-snow .ql-toolbar .ql-picker-label:hover, .ql-snow.ql-toolbar .ql-picker-label.ql-active, .ql-snow .ql-toolbar .ql-picker-label.ql-active, .ql-snow.ql-toolbar .ql-picker-item:hover, .ql-snow .ql-toolbar .ql-picker-item:hover, .ql-snow.ql-toolbar .ql-picker-item.ql-selected, .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button:focus,
+.ql-snow .ql-toolbar button:focus,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow .ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected {
   color: rgb(71, 71, 71) !important;
 }
 
-.ql-snow .ql-picker-options {
-  padding: 0;
+/* Set dropdown font-families */
+#toolbar-container .ql-font span[data-label='Segoe UI']::before {
+  font-family: 'Segoe UI';
 }
 
-.ql-picker-item {
-  padding: 4px 8px;
+#toolbar-container .ql-font span[data-label='Arial']::before {
+  font-family: 'Arial';
 }
 
-.ql-picker-item:hover{
-  background-color: #cccccc;
+#toolbar-container .ql-font span[data-label='Roboto']::before {
+  font-family: 'Roboto';
 }
 
-.exclude-copy {
-  border-top: 1px solid #cccccc;
+#toolbar-container .ql-font span[data-label='Raleway']::before {
+  font-family: 'Raleway';
+}
+
+#toolbar-container .ql-font span[data-label='Montserrat']::before {
+  font-family: 'Montserrat';
+}
+
+#toolbar-container .ql-font span[data-label='Lato']::before {
+  font-family: 'Lato';
+}
+
+#toolbar-container .ql-font span[data-label='Rubik']::before {
+  font-family: 'Rubik';
+}
+
+/* Set content font-families */
+.ql-font-segoe-ui {
+  font-family: 'Segoe UI';
+}
+
+.ql-font-arial {
+  font-family: 'Arial';
+}
+
+.ql-font-roboto {
+  font-family: 'Roboto';
+}
+
+.ql-font-raleway {
+  font-family: 'Raleway';
+}
+
+.ql-font-montserrat {
+  font-family: 'Montserrat';
+}
+
+.ql-font-lato {
+  font-family: 'Lato';
+}
+
+.ql-font-rubik {
+  font-family: 'Rubik';
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='9px']::before {
+  content: '9';
+  font-size: 9px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='10px']::before {
+  content: '10';
+  font-size: 10px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='11px']::before {
+  content: '11';
+  font-size: 11px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='12px']::before {
+  content: '12';
+  font-size: 12px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='14px']::before {
+  content: '14';
+  font-size: 14px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='16px']::before {
+  content: '16';
+  font-size: 16px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='18px']::before {
+  content: '18';
+  font-size: 18px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='20px']::before {
+  content: '20';
+  font-size: 20px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='22px']::before {
+  content: '22';
+  font-size: 22px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='24px']::before {
+  content: '24';
+  font-size: 24px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='26px']::before {
+  content: '26';
+  font-size: 26px !important;
+}
+
+.ql-snow .ql-size .ql-picker-item[data-value='28px']::before {
+  content: '28';
+  font-size: 28px !important;
+}
+
+/* Set Segoe UI font for different font sizes */
+.ql-size-9px {
+  font-size: 9px;
+  font-family: 'Segoe UI';
+}
+
+.ql-size-10px {
+  font-size: 10px;
+  font-family: 'Segoe UI';
+}
+
+.ql-size-11px {
+  font-size: 11px;
+  font-family: 'Segoe UI';
+}
+
+.ql-size-9px {
+  font-size: 9px;
+}
+
+.ql-size-10px {
+  font-size: 10px;
+}
+
+.ql-size-11px {
+  font-size: 11px;
+}
+
+.ql-size-12px {
+  font-size: 12px;
+}
+
+.ql-size-14px {
+  font-size: 14px;
+}
+
+.ql-size-16px {
+  font-size: 16px;
+}
+
+.ql-size-18px {
+  font-size: 18px;
+}
+
+.ql-size-20px {
+  font-size: 20px;
+}
+
+.ql-size-22px {
+  font-size: 22px;
+}
+
+.ql-size-24px {
+  font-size: 24px;
+}
+
+.ql-size-26px {
+  font-size: 26px;
+}
+
+.ql-size-28px {
+  font-size: 28px;
+}
+
+.line-dotted {
+  border-style: dotted;
+}
+
+.line-solid {
+  border-style: solid;
+}
+
+.line-double {
+  border-style: double;
+}
+
+.ql-snow .ql-picker.ql-box .ql-picker-label::before,
+.ql-snow .ql-picker.ql-box .ql-picker-item::before {
+  content: 'None';
+}
+
+.ql-snow .ql-picker.ql-box .ql-picker-label[data-value='solid']::before,
+.ql-snow .ql-picker.ql-box .ql-picker-item[data-value='solid']::before {
+  content: 'Solid';
+}
+
+.ql-snow .ql-picker.ql-box .ql-picker-label[data-value='double']::before,
+.ql-snow .ql-picker.ql-box .ql-picker-item[data-value='double']::before {
+  content: 'Double';
+}
+
+.ql-snow .ql-picker.ql-box .ql-picker-label[data-value='dotted']::before,
+.ql-snow .ql-picker.ql-box .ql-picker-item[data-value='dotted']::before {
+  content: 'Dotted';
+}
+
+.ql-snow span.ql-picker.ql-box {
+  width: 8em;
 }
