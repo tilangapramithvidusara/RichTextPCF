@@ -4,6 +4,8 @@ import 'quill-mention';
 import 'react-quill/dist/quill.snow.css';
 import '../css/RichTextController.css';
 import { Spin } from 'antd';
+import { languageConstantsForCountry } from '../Constants/languageConstants';
+import { loadResourceString } from '../apis/xrmRequests';
 
 declare global {
   interface Window {
@@ -174,51 +176,79 @@ export default function Editor() {
   const [copyNotAllowed, setCopyNotAllowed] = useState<string>("Copying questions is not allowed on this webpage");
   const [apiNotSupport, setApiNotSupport] = useState<string>("Permissions API not supported")
   const [grantPermission, setGrantPermission] = useState<string>("You need to grant permission to copy on this webpage")
+  const [languageConstants, setLanguageConstants] = useState<any>(
+    languageConstantsForCountry.en
+  );
+  
+  // const loadResourceString = async () => {
 
-  const loadResourceString = async () => {
+  //   const url = await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
+  //   const language = await window.parent.Xrm.Utility.getGlobalContext().userSettings.languageId
+  //   const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
 
-    const url = await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
-    const language = await window.parent.Xrm.Utility.getGlobalContext().userSettings.languageId
-    const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
+  //   try {
+  //     const response = await fetch(`${webResourceUrl}`);
+  //     const data = await response.text();
+  //     const filterKeys = ['copyingnotallowed', 'permissionapinotsupport', 'grantpermission']; // Replace with the key you want to filter
+  //     filterKeys.map((filterKey: string, index: number) => {
+  //       const parser = new DOMParser();
+  //       // Parse the XML string
+  //       const xmlDoc = parser.parseFromString(data, "text/xml");
+  //       // Find the specific data element with the given key
+  //       const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
+  //       // Extract the value from the data element
+  //       const value: any = dataNode?.querySelector("value").textContent;
 
+  //       if (index === 0) {
+  //         setCopyNotAllowed(value)
+  //       }
+  //       if (index === 1) {
+  //         setApiNotSupport(value)
+  //       }
+  //       if (index === 2) {
+  //         setGrantPermission(value)
+  //       }
+  //       console.log('data ====> ',  index, value);
+  //     });
+  //     // this.setState({ data });
+  //   } catch (error) {
+  //     console.error('Error loading data:', error);
+  //   }
+  // }
+
+  // const messageHandler = async() => {
+  //   try {
+  //     await loadResourceString();
+  //   } catch (error) {
+  //     console.log('error ====>', error);
+  //   }
+  // }
+
+  
+  const messageHandler = async () => {
     try {
-      const response = await fetch(`${webResourceUrl}`);
-      const data = await response.text();
-      const filterKeys = ['copyingnotallowed', 'permissionapinotsupport', 'grantpermission']; // Replace with the key you want to filter
-      filterKeys.map((filterKey: string, index: number) => {
-        const parser = new DOMParser();
-        // Parse the XML string
-        const xmlDoc = parser.parseFromString(data, "text/xml");
-        // Find the specific data element with the given key
-        const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
-        // Extract the value from the data element
-        const value: any = dataNode?.querySelector("value").textContent;
-
-        if (index === 0) {
-          setCopyNotAllowed(value)
+      const languageConstantsFromResourceTable : any = await loadResourceString();
+      if (languageConstantsFromResourceTable?.data && languageConstants?.length) {
+        console.log("languageConstantsFromResTable 2", languageConstantsFromResourceTable);
+        const refactorResourceTable = languageConstantsFromResourceTable?.data.reduce((result: any, currentObject: any) => {
+          return Object.assign(result, currentObject);
+        }, {});
+        if (Object.keys(refactorResourceTable).length) {
+          const originalConstants = languageConstants[0];
+          const updatedValues = refactorResourceTable[0];
+          for (const key in updatedValues) {
+            if (key in updatedValues && key in originalConstants) {
+              originalConstants[key] = updatedValues[key];
+            }
+          }
+          setLanguageConstants(originalConstants);
         }
-        if (index === 1) {
-          setApiNotSupport(value)
-        }
-        if (index === 2) {
-          setGrantPermission(value)
-        }
-        console.log('data ====> ',  index, value); 
-      });
-      // this.setState({ data });
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-  }
-
-  const messageHandler = async() => {
-    try {
-      await loadResourceString();
+      }
     } catch (error) {
       console.log('error ====>', error);
     }
   }
-
+  
   const retriveTemplateHandler = async () => {
     setLoadingTemp(true);
     try {

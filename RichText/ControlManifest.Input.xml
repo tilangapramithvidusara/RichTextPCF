@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="Seer365Controls" constructor="RichText" version="1.23.193" display-name-key="RichText" description-key="RichText description" control-type="standard" >
+  <control namespace="Seer365Controls" constructor="RichText" version="1.23.194" display-name-key="RichText" description-key="RichText description" control-type="standard" >
     <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="Multiple" usage="bound" required="true" />
     <resources>
       <code path="index.ts" order="1"/>
