@@ -4,6 +4,8 @@ import "react-quill/dist/quill.snow.css";
 
 import "../css/RichTextController.css";
 import Editor from "./RichTextComponent";
+import { loadResourceString } from "../apis/xrmRequests";
+import { languageConstantsForCountry } from "../Constants/languageConstants";
 
 declare global {
   interface Window {
@@ -21,49 +23,32 @@ const RichTextEditor = ({ quill, context, container }: any) => {
   const [value, setValue] = useState("");
   const [isDisable, setIsDisable] = useState<boolean>(false);
   const quillRef = useRef<ReactQuill>(null);
-  const [copyNotAllowed, setCopyNotAllowed] = useState<string>("Copying questions is not allowed on this webpage");
-  const [apiNotSupport, setApiNotSupport] = useState<string>("Permissions API not supported")
-  const [grantPermission, setGrantPermission] = useState<string>("You need to grant permission to copy on this webpage")
+  // const [copyNotAllowed, setCopyNotAllowed] = useState<string>("Copying questions is not allowed on this webpage");
+  // const [apiNotSupport, setApiNotSupport] = useState<string>("Permissions API not supported")
+  // const [grantPermission, setGrantPermission] = useState<string>("You need to grant permission to copy on this webpage")
+  const [languageConstants, setLanguageConstants] = useState<any>(
+    languageConstantsForCountry.en
+  );
 
-  const loadResourceString = async () => {
-
-    const url = await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
-    const language = await window.parent.Xrm.Utility.getGlobalContext().userSettings.languageId
-    const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
-
+  const messageHandler = async () => {
     try {
-      const response = await fetch(`${webResourceUrl}`);
-      const data = await response.text();
-      const filterKeys = ['copyingnotallowed', 'permissionapinotsupport', 'grantpermission']; // Replace with the key you want to filter
-      filterKeys.map((filterKey: string, index: number) => {
-        const parser = new DOMParser();
-        // Parse the XML string
-        const xmlDoc = parser.parseFromString(data, "text/xml");
-        // Find the specific data element with the given key
-        const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
-        // Extract the value from the data element
-        const value: any = dataNode?.querySelector("value").textContent;
-
-        if (index === 0) {
-          setCopyNotAllowed(value)
+      const languageConstantsFromResourceTable : any = await loadResourceString();
+      if (languageConstantsFromResourceTable?.data && languageConstants?.length) {
+        console.log("languageConstantsFromResTable 2", languageConstantsFromResourceTable);
+        const refactorResourceTable = languageConstantsFromResourceTable?.data.reduce((result: any, currentObject: any) => {
+          return Object.assign(result, currentObject);
+        }, {});
+        if (Object.keys(refactorResourceTable).length) {
+          const originalConstants = languageConstants[0];
+          const updatedValues = refactorResourceTable[0];
+          for (const key in updatedValues) {
+            if (key in updatedValues && key in originalConstants) {
+              originalConstants[key] = updatedValues[key];
+            }
+          }
+          setLanguageConstants(originalConstants);
         }
-        if (index === 1) {
-          setApiNotSupport(value)
-        }
-        if (index === 2) {
-          setGrantPermission(value)
-        }
-        console.log('data ====> ',  index, value); 
-      });
-      // this.setState({ data });
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-  }
-
-  const messageHandler = async() => {
-    try {
-      await loadResourceString();
+      }
     } catch (error) {
       console.log('error ====>', error);
     }
@@ -114,10 +99,10 @@ const RichTextEditor = ({ quill, context, container }: any) => {
   //   }
   // }, []);
 
-  // useEffect(() => {
-  //   messageHandler();
-  //   retriveTemplateHandler();
-  // }, []);
+  useEffect(() => {
+    messageHandler();
+    // retriveTemplateHandler();
+  }, []);
 
   useEffect(() => {
     const handleContextMenu = (event: any) => {
@@ -139,10 +124,10 @@ const RichTextEditor = ({ quill, context, container }: any) => {
         
         if (navigator.userAgent.includes("Safari/") && !(navigator.userAgent.includes("Chrome/") || navigator.userAgent.includes("Edge/"))) {
           event.preventDefault();
-          await navigator.clipboard.writeText(apiNotSupport);
+          await navigator.clipboard.writeText(languageConstants?.RichText_APIPermissionErrorMessage);
           await navigator.clipboard.writeText("");
         } else if (navigator.userAgent.includes("Firefox/")) {
-          await navigator.clipboard.writeText(apiNotSupport);
+          await navigator.clipboard.writeText(languageConstants?.RichText_APIPermissionErrorMessage);
         } else if (navigator?.permissions) {          
           // const permissionName = "clipboard-read" as PermissionName;
           const permissionStatus = await navigator.permissions.query({name: permision as PermissionName, allowWithoutGesture: false}); // allowWithoutGesture: false
@@ -159,18 +144,18 @@ const RichTextEditor = ({ quill, context, container }: any) => {
               console.log('condition ====> ', clipboardData.includes(descriptionText));
 
               if (clipboardData.includes(descriptionText)) {
-                await navigator.clipboard.writeText(copyNotAllowed);
+                await navigator.clipboard.writeText(languageConstants?.RichText_CopyQuestionNotAllowed);
               }
             }
           } else {
-            await navigator.clipboard.writeText(grantPermission);
+            await navigator.clipboard.writeText(languageConstants?.RichText_GrantPermissionErrorMessage);
           }
         } else {
-          await navigator.clipboard.writeText(apiNotSupport);
+          await navigator.clipboard.writeText(languageConstants?.RichText_APIPermissionErrorMessage);
         }
       } catch (error) {
         console.error(error);
-        await navigator.clipboard.writeText(copyNotAllowed);
+        await navigator.clipboard.writeText(languageConstants?.RichText_CopyQuestionNotAllowed);
       }
     };
 
